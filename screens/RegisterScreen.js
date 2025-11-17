@@ -31,10 +31,8 @@ export default function RegisterScreen({ navigation }) {
       createdAt: Date.now(),
     };
 
-    // 🔥 SALVAR O USUÁRIO NO STORAGE
     await saveUser(newUser);
 
-    // 🔥 LEVAR PARA A HOME JÁ LOGADO
     navigation.reset({
       index: 0,
       routes: [{ name: 'Home' }],

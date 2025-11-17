@@ -11,19 +11,28 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 export default function WorkoutExecutionScreen({ navigation, route }) {
-  const { workout } = route.params;
+  const { workout } = route.params || {};
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [isResting, setIsResting] = useState(false);
   const [restTime, setRestTime] = useState(0);
   const [completedSets, setCompletedSets] = useState([]);
 
-  // Segurança: se por algum motivo não vier workout, evita crash
-  if (!workout || !Array.isArray(workout.exercises)) {
+  // Validação de dados
+  if (!workout || !workout.exercises || !Array.isArray(workout.exercises)) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text>Treino inválido.</Text>
-        <TouchableOpacity onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}>
-          <Text style={{ color: '#6C5CE7', marginTop: 12 }}>Voltar</Text>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+        <Ionicons name="alert-circle-outline" size={64} color="#FF6B6B" />
+        <Text style={{ fontSize: 18, fontWeight: '600', color: '#1A1A1A', marginTop: 16, textAlign: 'center' }}>
+          Erro ao carregar treino
+        </Text>
+        <Text style={{ fontSize: 14, color: '#666', marginTop: 8, textAlign: 'center' }}>
+          Os dados do treino estão inválidos ou não foram carregados.
+        </Text>
+        <TouchableOpacity 
+          style={styles.errorButton}
+          onPress={() => navigation.navigate('Home')}
+        >
+          <Text style={styles.errorButtonText}>Voltar para o Início</Text>
         </TouchableOpacity>
       </View>
     );
@@ -48,20 +57,11 @@ export default function WorkoutExecutionScreen({ navigation, route }) {
     return () => clearInterval(interval);
   }, [isResting, restTime]);
 
-  const exitToPrevious = () => {
-    // Vai para a tela anterior se possível, senão faz fallback para Home
-    if (navigation && typeof navigation.canGoBack === 'function' && navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate && navigation.navigate('Home');
-    }
-  };
-
   const handleCompleteSet = () => {
     const exerciseKey = `${currentExerciseIndex}-${completedSets.length}`;
-    setCompletedSets(prev => [...prev, exerciseKey]);
+    setCompletedSets([...completedSets, exerciseKey]);
     
-    // Inicia descanso (tenta extrair número; se inválido, não inicia)
+    // Inicia descanso
     const restSeconds = parseInt(currentExercise.rest, 10);
     if (!isNaN(restSeconds) && restSeconds > 0) {
       setRestTime(restSeconds);
@@ -71,30 +71,28 @@ export default function WorkoutExecutionScreen({ navigation, route }) {
 
   const handleNextExercise = () => {
     if (currentExerciseIndex < workout.exercises.length - 1) {
-      setCurrentExerciseIndex(prev => prev + 1);
+      setCurrentExerciseIndex(currentExerciseIndex + 1);
       setCompletedSets([]);
       setIsResting(false);
       setRestTime(0);
     } else {
-      // último exercício -> mostrar alerta com opção de finalizar
+      // Treino completo
       Alert.alert(
         'Parabéns! 🎉',
         'Você completou o treino!',
         [
           {
             text: 'Finalizar',
-            onPress: () => exitToPrevious()
+            onPress: () => navigation.navigate('Home'),
           },
-          { text: 'Continuar aqui', style: 'cancel' }
-        ],
-        { cancelable: true }
+        ]
       );
     }
   };
 
   const handlePreviousExercise = () => {
     if (currentExerciseIndex > 0) {
-      setCurrentExerciseIndex(prev => prev - 1);
+      setCurrentExerciseIndex(currentExerciseIndex - 1);
       setCompletedSets([]);
       setIsResting(false);
       setRestTime(0);
@@ -108,25 +106,18 @@ export default function WorkoutExecutionScreen({ navigation, route }) {
 
   const handleQuit = () => {
     Alert.alert(
-        'Sair do treino?',
-        'Você perderá o progresso do treino atual.',
-        [
+      'Sair do treino?',
+      'Você perderá o progresso do treino atual.',
+      [
         { text: 'Cancelar', style: 'cancel' },
         { 
-            text: 'Sair', 
-            style: 'destructive',
-            onPress: () => {
-            if (navigation.canGoBack()) {
-                navigation.goBack();
-            } else {
-                navigation.navigate('Home');
-            }
-            }
+          text: 'Sair', 
+          style: 'destructive',
+          onPress: () => navigation.navigate('Home'),
         },
-        ]
+      ]
     );
-    };
-
+  };
 
   return (
     <View style={styles.container}>
@@ -136,13 +127,7 @@ export default function WorkoutExecutionScreen({ navigation, route }) {
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.headerButton}
-          onPress={() => {
-            if (navigation.canGoBack()) {
-                navigation.goBack();
-            } else {
-                navigation.navigate('Home');
-            }
-          }}
+          onPress={handleQuit}
         >
           <Ionicons name="close" size={28} color="#fff" />
         </TouchableOpacity>
@@ -169,8 +154,12 @@ export default function WorkoutExecutionScreen({ navigation, route }) {
       >
         {/* Card do Exercício Atual */}
         <View style={styles.exerciseCard}>
-          <View style={[styles.exerciseIcon, { backgroundColor: currentExercise.iconBg || '#eee' }]}>
-            <Ionicons name={currentExercise.icon || 'fitness'} size={48} color={currentExercise.iconColor || '#6C5CE7'} />
+          <View style={[styles.exerciseIcon, { backgroundColor: currentExercise.iconBg || '#E3F2FF' }]}>
+            <Ionicons 
+              name={currentExercise.icon || 'fitness'} 
+              size={48} 
+              color={currentExercise.iconColor || '#6C5CE7'} 
+            />
           </View>
           
           <Text style={styles.exerciseName}>{currentExercise.name}</Text>
@@ -187,19 +176,23 @@ export default function WorkoutExecutionScreen({ navigation, route }) {
             <View style={styles.metricBox}>
               <Ionicons name="timer" size={24} color="#FF6B35" />
               <Text style={styles.metricLabel}>Descanso</Text>
-              <Text style={styles.metricValue}>{currentExercise.rest}</Text>
+              <Text style={styles.metricValue}>{currentExercise.rest}s</Text>
             </View>
           </View>
 
+          {/* Instruções */}
           <View style={styles.instructionsBox}>
             <View style={styles.instructionsHeader}>
               <Ionicons name="information-circle" size={20} color="#6C5CE7" />
               <Text style={styles.instructionsTitle}>Como fazer</Text>
             </View>
-            <Text style={styles.instructionsText}>{currentExercise.instructions}</Text>
+            <Text style={styles.instructionsText}>
+              {currentExercise.instructions || 'Execute o exercício conforme orientação.'}
+            </Text>
           </View>
         </View>
 
+        {/* Timer de Descanso */}
         {isResting && (
           <View style={styles.restCard}>
             <Ionicons name="timer-outline" size={48} color="#FF6B35" />
@@ -214,6 +207,7 @@ export default function WorkoutExecutionScreen({ navigation, route }) {
           </View>
         )}
 
+        {/* Sets Completados */}
         <View style={styles.setsContainer}>
           <Text style={styles.setsTitle}>Séries completadas: {completedSets.length}</Text>
           <View style={styles.setsGrid}>
@@ -234,7 +228,9 @@ export default function WorkoutExecutionScreen({ navigation, route }) {
         </View>
       </ScrollView>
 
+      {/* Botões de Ação */}
       <View style={styles.actionContainer}>
+        {/* Botão Série Completada */}
         {!isResting && (
           <TouchableOpacity 
             style={styles.completeSetButton}
@@ -245,6 +241,7 @@ export default function WorkoutExecutionScreen({ navigation, route }) {
           </TouchableOpacity>
         )}
 
+        {/* Navegação entre Exercícios */}
         <View style={styles.navigationButtons}>
           <TouchableOpacity 
             style={[styles.navButton, currentExerciseIndex === 0 && styles.navButtonDisabled]}
@@ -524,5 +521,17 @@ const styles = StyleSheet.create({
   },
   navButtonTextDisabled: {
     color: '#999',
+  },
+  errorButton: {
+    backgroundColor: '#6C5CE7',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 20,
+  },
+  errorButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

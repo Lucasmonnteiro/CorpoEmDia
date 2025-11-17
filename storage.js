@@ -1,8 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-/**
- * Salva o usuário no AsyncStorage
- */
 export async function saveUser(user) {
   try {
     await AsyncStorage.setItem('user', JSON.stringify(user));
@@ -10,10 +6,6 @@ export async function saveUser(user) {
     console.log("Erro ao salvar usuário:", error);
   }
 }
-
-/**
- * Busca o usuário salvo
- */
 export async function getUser() {
   try {
     const data = await AsyncStorage.getItem('user');
@@ -23,10 +15,6 @@ export async function getUser() {
     return null;
   }
 }
-
-/**
- * Remove o usuário (logout)
- */
 export async function removeUser() {
   try {
     await AsyncStorage.removeItem('user');

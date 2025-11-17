@@ -27,7 +27,6 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
-    // 🔥 Login bem-sucedido → Reset na navegação
     navigation.reset({
       index: 0,
       routes: [{ name: 'Home' }],

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -11,10 +11,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 export default function WorkoutDetailScreen({ navigation, route }) {
-  const { workoutId, workoutName } = route.params || {};
-  const [currentExercise, setCurrentExercise] = useState(0);
+  const { workoutId } = route.params || {};
 
-  // Dados do treino (em produção, viria de uma API)
   const workoutData = {
     1: {
       id: 1,
@@ -30,7 +28,7 @@ export default function WorkoutDetailScreen({ navigation, route }) {
           id: 1,
           name: 'Supino Reto',
           sets: '4x12',
-          rest: '90s',
+          rest: '90',
           icon: 'barbell',
           iconColor: '#4A9FFF',
           iconBg: '#E3F2FF',
@@ -40,7 +38,7 @@ export default function WorkoutDetailScreen({ navigation, route }) {
           id: 2,
           name: 'Supino Inclinado',
           sets: '4x10',
-          rest: '90s',
+          rest: '90',
           icon: 'barbell',
           iconColor: '#4A9FFF',
           iconBg: '#E3F2FF',
@@ -50,7 +48,7 @@ export default function WorkoutDetailScreen({ navigation, route }) {
           id: 3,
           name: 'Crucifixo',
           sets: '3x15',
-          rest: '60s',
+          rest: '60',
           icon: 'fitness',
           iconColor: '#00D4AA',
           iconBg: '#D4FFF4',
@@ -60,7 +58,7 @@ export default function WorkoutDetailScreen({ navigation, route }) {
           id: 4,
           name: 'Tríceps Testa',
           sets: '4x12',
-          rest: '60s',
+          rest: '60',
           icon: 'barbell',
           iconColor: '#FF6B35',
           iconBg: '#FFE8E0',
@@ -70,7 +68,7 @@ export default function WorkoutDetailScreen({ navigation, route }) {
           id: 5,
           name: 'Tríceps Pulley',
           sets: '3x15',
-          rest: '45s',
+          rest: '45',
           icon: 'flash',
           iconColor: '#FF6B35',
           iconBg: '#FFE8E0',
@@ -92,7 +90,7 @@ export default function WorkoutDetailScreen({ navigation, route }) {
           id: 1,
           name: 'Saudação ao Sol',
           sets: '5x',
-          rest: '30s',
+          rest: '30',
           icon: 'sunny',
           iconColor: '#FF6B35',
           iconBg: '#FFE8E0',
@@ -102,7 +100,7 @@ export default function WorkoutDetailScreen({ navigation, route }) {
           id: 2,
           name: 'Postura do Guerreiro',
           sets: '3x30s',
-          rest: '20s',
+          rest: '20',
           icon: 'body',
           iconColor: '#00D4AA',
           iconBg: '#D4FFF4',
@@ -124,7 +122,7 @@ export default function WorkoutDetailScreen({ navigation, route }) {
           id: 1,
           name: 'Burpees',
           sets: '4x20',
-          rest: '45s',
+          rest: '45',
           icon: 'fitness',
           iconColor: '#FF6B35',
           iconBg: '#FFE8E0',
@@ -134,7 +132,7 @@ export default function WorkoutDetailScreen({ navigation, route }) {
           id: 2,
           name: 'Mountain Climbers',
           sets: '4x30s',
-          rest: '30s',
+          rest: '30',
           icon: 'flash',
           iconColor: '#4A9FFF',
           iconBg: '#E3F2FF',
@@ -240,7 +238,7 @@ export default function WorkoutDetailScreen({ navigation, route }) {
                   </View>
                   <View style={styles.metaItem}>
                     <Ionicons name="timer-outline" size={14} color="#666" />
-                    <Text style={styles.metaText}>{exercise.rest}</Text>
+                    <Text style={styles.metaText}>{exercise.rest}s</Text>
                   </View>
                 </View>
               </View>
